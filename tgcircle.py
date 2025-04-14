@@ -4,7 +4,7 @@ import numpy as np
 import os
 import time
 import logging
-from moviepy.editor import VideoFileClip, AudioFileClip
+from moviepy import VideoFileClip, AudioFileClip
 import tempfile
 import shutil
 
