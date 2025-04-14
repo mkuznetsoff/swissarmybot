@@ -3,9 +3,11 @@ import os
 import time
 import logging
 import numpy as np
-from moviepy.editor import VideoFileClip, AudioFileClip
+from moviepy import VideoFileClip, AudioFileClip
 from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
 import cv2
+import tempfile
+import shutil
 
 # Настройка логирования
 logging.basicConfig(
@@ -75,8 +77,8 @@ def handle_media(message):
         # Загрузка видео и обрезка
         video_clip = VideoFileClip(input_path)
         duration = min(video_clip.duration, MAX_DURATION)
-        video_clip = video_clip.subclip(0, duration)
-        audio_clip = video_clip.audio.subclip(0, duration) if video_clip.audio else None
+        video_clip = video_clip.subclipped(0, duration)
+        audio_clip = video_clip.audio.subclipped(0, duration) if video_clip.audio else None
 
         fps = min(int(video_clip.fps), 60)
         logging.info(f"FPS: оригинал={video_clip.fps}, используем={fps}")
@@ -103,7 +105,7 @@ def handle_media(message):
         # Сборка и сохранение
         final_clip = ImageSequenceClip(processed_frames, fps=fps)
         if audio_clip:
-            final_clip = final_clip.set_audio(audio_clip)
+            final_clip = final_clip.with_audio(audio_clip)
 
         final_clip.write_videofile(
             output_path,
@@ -112,7 +114,6 @@ def handle_media(message):
             fps=fps,
             preset='ultrafast',
             threads=4,
-            verbose=False,
             logger=None
         )
 
