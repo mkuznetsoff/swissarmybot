@@ -5,6 +5,8 @@ import os
 import time
 import logging
 from moviepy.editor import VideoFileClip, AudioFileClip
+import tempfile
+import shutil
 
 # Логирование
 logging.basicConfig(
@@ -16,11 +18,9 @@ logging.basicConfig(
 TOKEN = '7370489438:AAGL0PyF58JTVdl5YSlHxS3BO33-ca9JgQo'
 bot = telebot.TeleBot(TOKEN)
 
-# Папка для временных файлов
-temp_dir = r"C:\Users\ndbya\Documents\kodd\tts\cir"
-if not os.path.exists(temp_dir):
-    os.makedirs(temp_dir)
-    logging.info(f"Создана папка для файлов: {temp_dir}")
+# Временная директория
+temp_dir = tempfile.mkdtemp()
+logging.info(f"Создана временная директория: {temp_dir}")
 
 # Константы видео note
 NOTE_SIZE = 512  # видео note должно быть квадратным
@@ -69,9 +69,7 @@ def handle_media(message):
 
     # Создаем папку для каждого пользователя (если еще не существует)
     user_folder = os.path.join(temp_dir, str(user_id))
-    if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
-        logging.info(f"Создана папка для пользователя {user_id}: {user_folder}")
+    os.makedirs(user_folder, exist_ok=True)
 
     # Сохранение файла с индексом
     input_path = os.path.join(user_folder, f"input_video_{file_index}.mp4")
@@ -150,4 +148,8 @@ def handle_media(message):
         except Exception as e:
             logging.error(f"Ошибка повторной попытки удаления файлов: {e}")
 
-bot.polling()
+    try:
+        bot.polling()
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        logging.info(f"Временная директория удалена: {temp_dir}")
