@@ -1,0 +1,4 @@
+API_TOKEN = '7370489438:AAGL0PyF58JTVdl5YSlHxS3BO33-ca9JgQo'  # Замените на ваш токен
+TEMP_DIR = 'temp'
+NOTE_SIZE = 512
+MAX_DURATION = 60
